@@ -3,7 +3,7 @@
 CC                  = gcc
 CFLAGS              = -pipe
 
-ENABLE_DEBUG        = 1
+ENABLE_DEBUG        = 0
 ENABLE_STATIC       = 1
 ENABLE_SHARED       = 0
 

@@ -9,9 +9,9 @@ static char font[] = "Monospace:pixelsize=14:antialias=true:hinting=true:hintsty
 static int borderpx = 2;
 
 /*
- * terminal transparency
+ * opaque terminal
  */
-static uint8_t term_alpha = 0xaa;
+static uint8_t term_alpha = 0xff;
 
 /*
  * What program is execed by st depends of these precedence rules:
