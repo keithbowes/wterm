@@ -18,9 +18,13 @@ It sorta works ™ , please report bugs.
 * pixman
 * libdrm
 
-On ubuntu it's
+On Ubuntu, it's:
 
     sudo apt install libdrm-dev libfontconfig1-dev libwayland-dev libxkbcommon-dev libpixman-1-dev pkg-config
+
+On Linux, it's:
+
+    sudo dnf install libdrm-devel libfontconfig-devel libwayland-devel libxkbcommon-devel libpixman-devel pkgconf-pkg-config
 
 ## build
 
