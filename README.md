@@ -1,4 +1,4 @@
-# wterm - xterm for wayland
+# wterm - terminal emulator for Wayland
 
 
 wterm is a native Wayland terminal emulator based on an st fork using wld.
