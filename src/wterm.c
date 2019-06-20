@@ -550,12 +550,12 @@ static struct wl_keyboard_listener kbdlistener = {
 static struct wl_pointer_listener ptrlistener = {ptrenter, ptrleave, ptrmotion,
                                                  ptrbutton, ptraxis};
 static struct xdg_wm_base_listener base_listener = {xdgshellping};
-static struct wl_data_device_listener datadevlistener = {
-    datadevoffer,  datadeventer, datadevleave,
-    datadevmotion, datadevdrop,  datadevselection};
 static struct xdg_surface_listener xdgsurflistener = {xdgsurfconfigure};
 static struct xdg_toplevel_listener xdgtoplevellistener = {xdgtopconfigure,
                                                            xdgtopclose};
+static struct wl_data_device_listener datadevlistener = {
+    datadevoffer,  datadeventer, datadevleave,
+    datadevmotion, datadevdrop,  datadevselection};
 static struct wl_data_offer_listener dataofferlistener = {dataofferoffer};
 static struct wl_data_source_listener datasrclistener = {
     datasrctarget, datasrcsend, datasrccancelled};
