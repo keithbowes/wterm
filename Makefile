@@ -4,7 +4,10 @@ include config.mk
 SRC=src
 WLDSRC=$(SRC)/wld
 
-PKGS = fontconfig wayland-client wayland-cursor xkbcommon pixman-1 libdrm
+# check_pkg($package, $min_version)
+check_pkg=$(if $(shell pkg-config --atleast-version=$2 $1 && echo No),echo "Found $1 $(shell pkg-config --modversion $1)",$(error Couldn't find package $1, version $2 or higher))
+
+PKGS = fontconfig wayland-client:1.12 wayland-cursor xkbcommon pixman-1 libdrm
 
 WTERM_SOURCES += $(wildcard $(SRC)/*.c)
 WTERM_HEADERS += $(wildcard $(SRC)/*.h)
@@ -19,8 +22,8 @@ CFLAGS += -DWITH_NOUVEAU_DRM
 endif
 
 CFLAGS += -std=gnu99 -Wall -g -DWITH_WAYLAND_DRM -DWITH_WAYLAND_SHM
-CFLAGS += $(shell pkg-config --cflags $(PKGS)) -I include
-LDFLAGS = $(shell pkg-config --libs $(PKGS)) -lm -lutil -L src/wld -lwld
+CFLAGS += $(shell pkg-config --cflags $(shell echo $(PKGS) | sed -e 's/:\S\+//g')) -I include
+LDFLAGS = $(shell pkg-config --libs $(shell echo $(PKGS) | sed -e 's/:\S\+//g')) -lm -lutil -L src/wld -lwld
 
 WAYLAND_HEADERS = $(wildcard include/*.xml)
 
@@ -33,7 +36,12 @@ OBJECTS = $(SOURCES:.c=.o)
 BIN_PREFIX = $(PREFIX)
 SHARE_PREFIX = $(PREFIX)
 
-all: wld wterm
+.PHONY: all check wld clean install-icons install-bin install uninstall-icons
+	uninstall-bin uninstall format 
+all: check wld wterm
+
+check:
+	@$(foreach pkg,$(PKGS),$(call check_pkg,$(shell echo $(pkg) | cut -d ':' -f 1),$(shell echo $(pkg) | cut -d ':' -f 2));)
 
 include/config.h:
 	cp config.def.h include/config.h
