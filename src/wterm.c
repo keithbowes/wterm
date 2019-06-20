@@ -239,12 +239,6 @@ typedef struct {
 } XKB;
 
 typedef struct {
-  struct xdg_wm_base *base;
-  uint32_t name;
-  _Bool stable;
-} XdgShell;
-
-typedef struct {
   struct wl_display *dpy;
   struct wl_compositor *cmp;
   struct wl_shm *shm;
@@ -256,7 +250,7 @@ typedef struct {
   struct wl_data_offer *seloffer;
   struct wl_surface *surface;
   struct wl_buffer *buffer;
-  XdgShell xdgshell;
+  struct xdg_wm_base *xdgshell;
   struct wl_shell *shell;
   struct wl_shell_surface *shellsurf;
   struct xdg_surface *xdgsurface;
@@ -2997,11 +2991,8 @@ void wlinit(void) {
 
   wl.surface = wl_compositor_create_surface(wl.cmp);
   wl_surface_add_listener(wl.surface, &surflistener, NULL);
-  if (wl.xdgshell.name) {
-    wl.xdgshell.base =
-        wl_registry_bind(registry, wl.xdgshell.name, &xdg_wm_base_interface, 1);
-    xdg_wm_base_add_listener(wl.xdgshell.base, &base_listener, NULL);
-    wl.xdgsurface = xdg_wm_base_get_xdg_surface(wl.xdgshell.base, wl.surface);
+  if (wl.xdgshell) {
+    wl.xdgsurface = xdg_wm_base_get_xdg_surface(wl.xdgshell, wl.surface);
     xdg_surface_add_listener(wl.xdgsurface, &xdgsurflistener, NULL);
     wl.xdgtoplevel = xdg_surface_get_toplevel(wl.xdgsurface);
     xdg_toplevel_add_listener(wl.xdgtoplevel, &xdgtoplevellistener, NULL);
@@ -3465,10 +3456,9 @@ void regglobal(void *data, struct wl_registry *registry, uint32_t name,
   if (strcmp(interface, "wl_compositor") == 0) {
     wl.cmp = wl_registry_bind(registry, name, &wl_compositor_interface, 3);
   } else if (strcmp(interface, "xdg_wm_base") == 0) {
-    wl.xdgshell.name = name;
-    wl.xdgshell.stable = true;
-  } else if (strcmp(interface, "zxdg_shell_v6") == 0 && !wl.xdgshell.stable) {
-    wl.xdgshell.name = name;
+    wl.xdgshell =
+        wl_registry_bind(registry, name, &xdg_wm_base_interface, 1);
+    xdg_wm_base_add_listener(wl.xdgshell, &base_listener, NULL);
   } else if (strcmp(interface, "wl_shm") == 0) {
     wl.shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
   } else if (strcmp(interface, "wl_seat") == 0) {

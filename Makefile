@@ -7,7 +7,7 @@ WLDSRC=$(SRC)/wld
 # check_pkg($package, $min_version)
 check_pkg=$(if $(shell pkg-config --atleast-version=$2 $1 && echo No),echo "Found $1 $(shell pkg-config --modversion $1)",$(error Couldn't find package $1, version $2 or higher))
 
-PKGS = fontconfig wayland-client:1.12 wayland-cursor xkbcommon pixman-1 libdrm
+PKGS = fontconfig wayland-client wayland-cursor wayland-protocols:1.12 wayland-scanner:1.14.91 xkbcommon pixman-1 libdrm
 
 WTERM_SOURCES += $(wildcard $(SRC)/*.c)
 WTERM_HEADERS += $(wildcard $(SRC)/*.h)
@@ -25,10 +25,8 @@ CFLAGS += -std=gnu99 -Wall -g -DWITH_WAYLAND_DRM -DWITH_WAYLAND_SHM
 CFLAGS += $(shell pkg-config --cflags $(shell echo $(PKGS) | sed -e 's/:\S\+//g')) -I include
 LDFLAGS = $(shell pkg-config --libs $(shell echo $(PKGS) | sed -e 's/:\S\+//g')) -lm -lutil -L src/wld -lwld
 
-WAYLAND_HEADERS = $(wildcard include/*.xml)
-
-HDRS = $(WAYLAND_HEADERS:.xml=-client-protocol.h)
-WAYLAND_SRC = $(HDRS:.h=.c)
+WAYLAND_HEADERS = include/xdg-shell-client-protocol.h
+WAYLAND_SRC = $(WAYLAND_HEADERS:.h=.c)
 SOURCES = $(WTERM_SOURCES) $(WAYLAND_SRC)
 
 OBJECTS = $(SOURCES:.c=.o)
@@ -38,7 +36,7 @@ SHARE_PREFIX = $(PREFIX)
 
 .PHONY: all check wld clean install-icons install-bin install uninstall-icons
 	uninstall-bin uninstall format 
-all: check wld wterm
+all: wld wterm
 
 check:
 	@$(foreach pkg,$(PKGS),$(call check_pkg,$(shell echo $(pkg) | cut -d ':' -f 1),$(shell echo $(pkg) | cut -d ':' -f 2));)
@@ -46,13 +44,15 @@ check:
 include/config.h:
 	cp config.def.h include/config.h
 
-include/%-client-protocol.c: include/%.xml
-	wayland-scanner code < $? > $@
+xdg_shell_protocol=$(shell pkg-config --variable=pkgdatadir wayland-protocols)/stable/xdg-shell/xdg-shell.xml
+include/xdg-shell-client-protocol.c: $(xdg_shell_protocol)
+	wayland-scanner private-code < $? > $@
 
-include/%-client-protocol.h: include/%.xml
+include/xdg-shell-client-protocol.h: $(xdg_shell_protocol)
+	@$(MAKE) check
 	wayland-scanner client-header < $? > $@
 
-$(OBJECTS): $(HDRS) include/config.h
+$(OBJECTS): $(WAYLAND_HEADERS) include/config.h
 
 wterm: $(OBJECTS)
 	$(CC) -o wterm $(OBJECTS) $(LDFLAGS)
@@ -61,7 +61,7 @@ wld:
 	make -C src/wld
 
 clean:
-	rm -f $(OBJECTS) $(HDRS) $(WAYLAND_SRC) include/config.h wterm
+	rm -f $(OBJECTS) $(WAYLAND_HEADERS) $(WAYLAND_SRC) include/config.h wterm
 	make -C src/wld clean
 
 install-icons:
