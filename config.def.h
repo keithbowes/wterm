@@ -9,9 +9,9 @@ static char font[] = "Monospace:pixelsize=14:antialias=true:hinting=true:hintsty
 static int borderpx = 2;
 
 /*
- * opaque terminal
+ * terminal transparency
  */
-static uint8_t term_alpha = 0xff;
+static uint8_t term_alpha = 0xaa;
 
 /*
  * What program is execed by wterm depends of these precedence rules:

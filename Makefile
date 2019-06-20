@@ -61,7 +61,7 @@ wld:
 	make -C src/wld
 
 clean:
-	rm -f $(OBJECTS) $(WAYLAND_HEADERS) $(WAYLAND_SRC) include/config.h wterm
+	rm -f $(OBJECTS) $(WAYLAND_HEADERS) $(WAYLAND_SRC) wterm
 	make -C src/wld clean
 
 install-icons:
