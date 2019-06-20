@@ -1133,7 +1133,7 @@ void sigchld(int a) {
   if (pid != p)
     return;
 
-  if (!WIFEXITED(stat) || WEXITSTATUS(stat))
+  if ((!WIFEXITED(stat) || WEXITSTATUS(stat)) && opt_cmd)
     die("child finished with error '%d'\n", stat);
   exit(0);
 }
