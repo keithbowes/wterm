@@ -3001,15 +3001,10 @@ void wlinit(void) {
     wl.xdgshell.base =
         wl_registry_bind(registry, wl.xdgshell.name, &xdg_wm_base_interface, 1);
     xdg_wm_base_add_listener(wl.xdgshell.base, &base_listener, NULL);
-  }
-  if (wl.xdgshell.base) {
     wl.xdgsurface = xdg_wm_base_get_xdg_surface(wl.xdgshell.base, wl.surface);
-    if (wl.xdgsurface) {
-      xdg_surface_add_listener(wl.xdgsurface, &xdgsurflistener, NULL);
-      wl.xdgtoplevel = xdg_surface_get_toplevel(wl.xdgsurface);
-      xdg_toplevel_add_listener(wl.xdgtoplevel, &xdgtoplevellistener, NULL);
-    } else
-      die("failed to get xdgsurface");
+    xdg_surface_add_listener(wl.xdgsurface, &xdgsurflistener, NULL);
+    wl.xdgtoplevel = xdg_surface_get_toplevel(wl.xdgsurface);
+    xdg_toplevel_add_listener(wl.xdgtoplevel, &xdgtoplevellistener, NULL);
   } else
     die("no wayland shell");
   wl_surface_commit(wl.surface);
