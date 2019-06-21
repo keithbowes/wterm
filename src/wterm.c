@@ -3,12 +3,18 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-/* for BTN_* definitions */
 #include "wld/wayland.h"
 #include "wld/wld.h"
 #include <fontconfig/fontconfig.h>
 #include <libgen.h>
-#include <linux/input.h>
+
+/* for BTN_* definitions */
+#if defined(__linux)
+#include <linux/input-event-codes.h>
+#else
+#include <sys/evdev/input-event-codes.h>
+#endif
+
 #include <locale.h>
 #include <pwd.h>
 #include <signal.h>
