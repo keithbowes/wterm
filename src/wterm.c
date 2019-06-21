@@ -3456,8 +3456,9 @@ void cresize(int width, int height) {
 
 void regglobal(void *data, struct wl_registry *registry, uint32_t name,
                const char *interface, uint32_t version) {
-  if (getenv("WTERM_DEBUG"))
-    printf("interface %s\n", interface);
+#ifdef ENABLE_DEBUG
+  printf("interface %d: %s\n", name, interface);
+#endif
 
   if (strcmp(interface, "wl_compositor") == 0) {
     wl.cmp = wl_registry_bind(registry, name, &wl_compositor_interface, 3);

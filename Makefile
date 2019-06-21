@@ -7,23 +7,28 @@ WLDSRC=$(SRC)/wld
 # check_pkg($package, $min_version)
 check_pkg=$(if $(shell pkg-config --atleast-version=$2 $1 && echo No),echo "Found $1 $(shell pkg-config --modversion $1)",$(error Couldn't find package $1, version $2 or higher))
 
-PKGS = fontconfig wayland-client wayland-cursor wayland-protocols:1.12 wayland-scanner:1.14.91 xkbcommon pixman-1 libdrm
+PKGS = fontconfig wayland-client wayland-cursor wayland-protocols:1.12 wayland-scanner:1.14.91 xkbcommon pixman-1
 
 WTERM_SOURCES += $(wildcard $(SRC)/*.c)
 WTERM_HEADERS += $(wildcard $(SRC)/*.h)
 
-ifeq ($(ENABLE_INTEL),1)
+ifneq ($(findstring drm,$(WAYLAND_INTERFACES)),)
+PKGS += libdrm
+ifneq ($(findstring intel,$(DRM_DRIVERS)),)
 PKGS += libdrm_intel
-CFLAGS += -DWITH_INTEL_DRM
 endif
-ifeq ($(ENABLE_NOUVEAU),1)
+ifneq ($(findstring nouveau,$(DRM_DRIVERS)),)
 PKGS += libdrm_nouveau
-CFLAGS += -DWITH_NOUVEAU_DRM
+endif
 endif
 
-CFLAGS += -std=gnu99 -Wall -g -DWITH_WAYLAND_DRM -DWITH_WAYLAND_SHM
+CFLAGS += -std=gnu99 -Wall
 CFLAGS += $(shell pkg-config --cflags $(shell echo $(PKGS) | sed -e 's/:\S\+//g')) -I include
 LDFLAGS = $(shell pkg-config --libs $(shell echo $(PKGS) | sed -e 's/:\S\+//g')) -lm -lutil -L src/wld -lwld
+
+ifneq ($(ENABLE_DEBUG),0)
+CFLAGS += -g -DENABLE_DEBUG
+endif
 
 WAYLAND_HEADERS = include/xdg-shell-client-protocol.h
 WAYLAND_SRC = $(WAYLAND_HEADERS:.h=.c)
