@@ -393,7 +393,7 @@ static void drawregion(int, int, int, int);
 static void execsh(void);
 static void stty(void);
 static void sigchld(int);
-static void run(void);
+static void run(int argc, char *argv[]);
 static void cresize(int, int);
 
 static void csidump(void);
@@ -3859,7 +3859,18 @@ void datasrccancelled(void *data, struct wl_data_source *source) {
   wl_data_source_destroy(source);
 }
 
-void run(void) {
+void run(int argc, char *argv[]) {
+  if (argc > 0) {
+    /* eat all remaining arguments */
+    opt_cmd = argv;
+    if (!opt_title && !opt_line)
+      opt_title = basename(xstrdup(argv[0]));
+  }
+  setlocale(LC_CTYPE, "");
+  tnew(80, 24);
+  wlinit();
+  selinit();
+
   fd_set rfd;
   int wlfd = wl_display_get_fd(wl.dpy), blinkset = 0;
   struct timespec drawtimeout, *tv = NULL, now, last, lastblink;
@@ -3968,7 +3979,8 @@ int main(int argc, char *argv[]) {
   case 'e':
     if (argc > 0)
       --argc, ++argv;
-    goto run;
+    run(argc, argv);
+    break;
   case 'f':
     opt_font = EARGF(usage());
     break;
@@ -3988,18 +4000,7 @@ int main(int argc, char *argv[]) {
   }
   ARGEND;
 
-run:
-  if (argc > 0) {
-    /* eat all remaining arguments */
-    opt_cmd = argv;
-    if (!opt_title && !opt_line)
-      opt_title = basename(xstrdup(argv[0]));
-  }
-  setlocale(LC_CTYPE, "");
-  tnew(80, 24);
-  wlinit();
-  selinit();
-  run();
+  run(argc, argv);
 
   return 0;
 }
