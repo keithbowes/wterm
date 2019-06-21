@@ -80,16 +80,23 @@ install-bin: wterm
 	mkdir -p $(BIN_PREFIX)/bin/
 	cp wterm $(BIN_PREFIX)/bin/
 
-install: install-bin install-icons
+install-man:
+	install -d $(SHARE_PREFIX)/share/man/man1
+	sed -e "s/VERSION/$(VERSION)/g" < wterm.1 | xz -c > $(SHARE_PREFIX)/share/man/man1/wterm.1.xz
+
+install: install-bin install-icons install-man
 
 uninstall-icons:
 	rm -f $(SHARE_PREFIX)/share/icons/hicolor/128x128/apps/wterm.png
-	rm -f $(sHARE_PREFIX)/share/icons/hicolor/scalable/apps/wterm.svg
+	rm -f $(SHARE_PREFIX)/share/icons/hicolor/scalable/apps/wterm.svg
 
 uninstall-bin:
 	rm -f $(BIN_PREFIX)/bin/wterm
 
-uninstall: uninstall-bin uninstall-icons
+uninstall-man:
+	rm -f $(SHARE_PREFIX)/share/man/man1/wterm.1.xz
+
+uninstall: uninstall-bin uninstall-icons uninstall-man
 
 format:
 	clang-format -i $(WTERM_SOURCES) $(WTERM_HEADERS)
