@@ -22,9 +22,9 @@ PKGS += libdrm_nouveau
 endif
 endif
 
-CFLAGS += -std=gnu99 -Wall
-CFLAGS += $(shell pkg-config --cflags $(shell echo $(PKGS) | sed -e 's/:\S\+//g')) -I include
-LDFLAGS = $(shell pkg-config --libs $(shell echo $(PKGS) | sed -e 's/:\S\+//g')) -lm -lutil -L src/wld -lwld
+CFLAGS += -std=gnu99 -Wall -g -DWITH_WAYLAND_DRM -DWITH_WAYLAND_SHM
+CFLAGS += $(shell pkg-config --cflags $(PKGS)) -I include
+LDFLAGS =src/wld/libwld.a $(shell pkg-config --libs $(PKGS)) -lm -lutil
 
 ifneq ($(ENABLE_DEBUG),0)
 CFLAGS += -g -DENABLE_DEBUG
