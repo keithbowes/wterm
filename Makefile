@@ -4,10 +4,7 @@ include config.mk
 SRC=src
 WLDSRC=$(SRC)/wld
 
-# check_pkg($package, $min_version)
-check_pkg=$(if $(shell pkg-config --atleast-version=$2 $1 && echo No),echo "Found $1 $(shell pkg-config --modversion $1)",$(error Couldn't find package $1, version $2 or higher))
-
-PKGS = fontconfig wayland-client wayland-cursor wayland-protocols:1.12 wayland-scanner:1.14.91 xkbcommon pixman-1
+PKGS = fontconfig wayland-client wayland-cursor wayland-protocols wayland-scanner xkbcommon pixman-1
 
 WTERM_SOURCES += $(wildcard $(SRC)/*.c)
 WTERM_HEADERS += $(wildcard $(SRC)/*.h)
@@ -39,12 +36,9 @@ OBJECTS = $(SOURCES:.c=.o)
 BIN_PREFIX = $(PREFIX)
 SHARE_PREFIX = $(PREFIX)
 
-.PHONY: all check wld clean install-icons install-bin install uninstall-icons
+.PHONY: all wld clean install-icons install-bin install uninstall-icons
 	uninstall-bin uninstall format 
 all: wld wterm
-
-check:
-	@$(foreach pkg,$(PKGS),$(call check_pkg,$(shell echo $(pkg) | cut -d ':' -f 1),$(shell echo $(pkg) | cut -d ':' -f 2));)
 
 include/config.h:
 	cp config.def.h include/config.h
@@ -54,7 +48,6 @@ include/xdg-shell-client-protocol.c: $(xdg_shell_protocol)
 	wayland-scanner private-code < $? > $@
 
 include/xdg-shell-client-protocol.h: $(xdg_shell_protocol)
-	@$(MAKE) check
 	wayland-scanner client-header < $? > $@
 
 $(OBJECTS): $(WAYLAND_HEADERS) include/config.h
