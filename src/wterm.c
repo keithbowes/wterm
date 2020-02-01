@@ -257,10 +257,7 @@ typedef struct {
   struct wl_surface *surface;
   struct wl_buffer *buffer;
   struct xdg_wm_base *xdgshell;
-  struct wl_shell *shell;
-  struct wl_shell_surface *shellsurf;
   struct xdg_surface *xdgsurface;
-  struct wl_surface *popupsurface;
   struct xdg_toplevel *xdgtoplevel;
   XKB xkb;
   bool configured;
@@ -3317,8 +3314,6 @@ void wldrawcursor(void) {
 void wlsettitle(char *title) {
   if (wl.xdgtoplevel)
     xdg_toplevel_set_title(wl.xdgtoplevel, title);
-  else if (wl.shellsurf)
-    wl_shell_surface_set_title(wl.shellsurf, title);
 }
 
 void wlresettitle(void) { wlsettitle(opt_title ? opt_title : "wterm"); }
