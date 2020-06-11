@@ -2956,7 +2956,7 @@ void wlinit(void) {
   if (!wld.ctx)
     die("Can't create wayland context\n");
   wld.renderer = wld_create_renderer(wld.ctx);
-  if (!wld.ctx)
+  if (!wld.ctx || !wld.renderer)
     die("Can't create renderer\n");
   if (!wl.shm)
     die("Display has no SHM\n");
